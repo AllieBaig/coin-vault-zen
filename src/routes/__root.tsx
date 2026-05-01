@@ -34,11 +34,15 @@ export const Route = createRootRoute({
       { title: "CoinVault — Unified coin database" },
       { name: "description", content: "Track, classify and explore your coin collection in a clean unified database." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "CoinVault" },
-      { property: "og:description", content: "Unified coin database — clean, fast, minimal." },
+      { property: "og:title", content: "CoinVault — Unified coin database" },
+      { property: "og:description", content: "Track, classify and explore your coin collection in a clean unified database." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "CoinVault — Unified coin database" },
+      { name: "twitter:description", content: "Track, classify and explore your coin collection in a clean unified database." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aa0bc739-4b93-4b4e-96ee-2203de0b7336/id-preview-24b50b78--f9cbbc35-86f8-4363-ae91-9092e406643e.lovable.app-1777661983965.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aa0bc739-4b93-4b4e-96ee-2203de0b7336/id-preview-24b50b78--f9cbbc35-86f8-4363-ae91-9092e406643e.lovable.app-1777661983965.png" },
     ],
     links: [
       {
