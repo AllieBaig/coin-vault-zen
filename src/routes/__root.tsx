@@ -3,6 +3,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import appCss from "../styles.css?url";
 import { CoinProvider } from "@/lib/coinvault/store";
 import Layout from "@/components/coinvault/Layout";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -74,6 +75,7 @@ function RootComponent() {
   return (
     <CoinProvider>
       <Layout />
+      <Toaster />
     </CoinProvider>
   );
 }
