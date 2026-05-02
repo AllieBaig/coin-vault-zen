@@ -1,0 +1,11 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>CoinVault</title>
+<script>
+  // GitHub Pages SPA fallback: redirect deep link to index.html, preserving the path.
+  (function () {
+    var l = window.location;
+    var redirect = l.pathname + l.search + l.hash;
+    sessionStorage.setItem("spa-redirect", redirect);
+    l.replace(l.origin + "/");
+  })();
+</script></head><body></body></html>
