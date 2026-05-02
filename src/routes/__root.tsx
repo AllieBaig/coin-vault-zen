@@ -32,7 +32,6 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "CoinVault — Unified coin database" },
       { name: "description", content: "Track, classify and explore your coin collection in a clean unified database." },
       { name: "author", content: "Lovable" },
