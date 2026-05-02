@@ -6,6 +6,7 @@ type Ctx = {
   add: (c: Omit<Coin, "id">) => void;
   update: (id: string, c: Partial<Coin>) => void;
   remove: (id: string) => void;
+  replaceAll: (coins: Coin[]) => void;
 };
 
 const CoinCtx = createContext<Ctx | null>(null);
@@ -30,6 +31,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     add: (c) => setCoins((p) => [{ ...c, id: crypto.randomUUID() }, ...p]),
     update: (id, c) => setCoins((p) => p.map((x) => (x.id === id ? { ...x, ...c } : x))),
     remove: (id) => setCoins((p) => p.filter((x) => x.id !== id)),
+    replaceAll: (next) => setCoins(next),
   }), [coins]);
 
   return <CoinCtx.Provider value={value}>{children}</CoinCtx.Provider>;
