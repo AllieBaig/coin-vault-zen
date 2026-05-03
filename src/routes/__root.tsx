@@ -111,7 +111,13 @@ function RootComponent() {
       host === "127.0.0.1";
     const isDev = !!(import.meta as any).env?.DEV;
 
-    if (isInIframe || isPreviewHost || isDev) {
+    let safeMode = false;
+    try {
+      const raw = localStorage.getItem("coinvault.prefs.v1");
+      if (raw) safeMode = !!JSON.parse(raw)?.swSafeMode;
+    } catch {}
+
+    if (isInIframe || isPreviewHost || isDev || safeMode) {
       navigator.serviceWorker.getRegistrations().then((regs) => {
         regs.forEach((r) => r.unregister());
       }).catch(() => {});
