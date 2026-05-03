@@ -1,9 +1,11 @@
 import { Coin } from "@/lib/coinvault/data";
+import { getDenominationDisplay } from "@/lib/coinvault/schema";
 import CoinThumb from "./CoinThumb";
 import { Pencil, Trash2 } from "lucide-react";
 
 export default function CoinRow({ coin, onEdit, onDelete }: { coin: Coin; onEdit: () => void; onDelete: () => void }) {
   const subtitle = [coin.year || null, coin.country || null].filter(Boolean).join(" · ");
+  const denom = getDenominationDisplay(coin);
   return (
     <div className="group flex items-center gap-3 px-3 py-2.5 rounded-xl border border-border bg-background hover:bg-secondary/60 transition-colors">
       <CoinThumb title={coin.title} />
@@ -13,9 +15,9 @@ export default function CoinRow({ coin, onEdit, onDelete }: { coin: Coin; onEdit
           {subtitle || "—"}{coin.era ? ` · ${coin.era}` : ""}
         </div>
       </div>
-      {coin.denomination && (
+      {denom && denom !== "Unknown" && (
         <span className="text-[11px] px-2 py-1 rounded-full bg-secondary text-foreground border border-border whitespace-nowrap">
-          {coin.denomination}
+          {denom}
         </span>
       )}
       <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">

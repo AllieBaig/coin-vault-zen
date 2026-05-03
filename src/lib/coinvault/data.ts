@@ -1,3 +1,9 @@
+import type {
+  Denomination,
+  SystemClassification,
+  Territory,
+} from "./schema";
+
 export type Coin = {
   id: string;
   title: string;
@@ -6,14 +12,27 @@ export type Coin = {
   region?: string;
   currency?: string;
   era?: string;
+  /** Legacy/string display value — kept in sync with denom.display. */
   denomination: string;
+  /** Structured denomination — UI must read from denom.display. */
+  denom?: Denomination;
   type?: string;
   material?: string;
   mint?: string;
   notes?: string;
   image?: string;
+  imageId?: string;
   folder?: string;
   addedAt?: number;
+  lastOpened?: number;
+  amountPaid?: number;
+  rarity?: string;
+  design?: string;
+  tags?: string[];
+  system?: SystemClassification;
+  territory?: Territory;
+  isValid?: boolean;
+  missingFields?: string[];
 };
 
 export type CountryNode = {

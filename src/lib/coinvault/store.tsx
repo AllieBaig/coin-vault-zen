@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useMemo } from "react";
 import { Coin, SAMPLE_COINS } from "./data";
+import { normalizeCoin, normalizeAll } from "./schema";
 
 type Ctx = {
   coins: Coin[];
@@ -13,12 +14,12 @@ const CoinCtx = createContext<Ctx | null>(null);
 const KEY = "coinvault.coins.v1";
 
 export function CoinProvider({ children }: { children: ReactNode }) {
-  const [coins, setCoins] = useState<Coin[]>(SAMPLE_COINS);
+  const [coins, setCoins] = useState<Coin[]>(() => normalizeAll(SAMPLE_COINS));
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) setCoins(JSON.parse(raw));
+      if (raw) setCoins(normalizeAll(JSON.parse(raw)));
     } catch {}
   }, []);
 
@@ -28,10 +29,10 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<Ctx>(() => ({
     coins,
-    add: (c) => setCoins((p) => [{ ...c, id: crypto.randomUUID(), addedAt: c.addedAt ?? Date.now() }, ...p]),
-    update: (id, c) => setCoins((p) => p.map((x) => (x.id === id ? { ...x, ...c } : x))),
+    add: (c) => setCoins((p) => [normalizeCoin({ ...c, id: crypto.randomUUID(), addedAt: c.addedAt ?? Date.now() }), ...p]),
+    update: (id, c) => setCoins((p) => p.map((x) => (x.id === id ? normalizeCoin({ ...x, ...c }) : x))),
     remove: (id) => setCoins((p) => p.filter((x) => x.id !== id)),
-    replaceAll: (next) => setCoins(next),
+    replaceAll: (next) => setCoins(normalizeAll(next)),
   }), [coins]);
 
   return <CoinCtx.Provider value={value}>{children}</CoinCtx.Provider>;
