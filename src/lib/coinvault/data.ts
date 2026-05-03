@@ -12,6 +12,8 @@ export type Coin = {
   mint?: string;
   notes?: string;
   image?: string;
+  folder?: string;
+  addedAt?: number;
 };
 
 export type CountryNode = {
