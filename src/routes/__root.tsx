@@ -3,6 +3,7 @@ import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 import { CoinProvider } from "@/lib/coinvault/store";
+import { PrefsProvider } from "@/lib/coinvault/prefs";
 import Layout from "@/components/coinvault/Layout";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -127,9 +128,11 @@ function RootComponent() {
   }, []);
 
   return (
-    <CoinProvider>
-      <Layout />
-      <Toaster />
-    </CoinProvider>
+    <PrefsProvider>
+      <CoinProvider>
+        <Layout />
+        <Toaster />
+      </CoinProvider>
+    </PrefsProvider>
   );
 }
