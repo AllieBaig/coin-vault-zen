@@ -144,3 +144,18 @@
     color: var(--color-foreground);
   }
 }
+
+/* Density */
+:root[data-density="compact"] { --space-y: 0.5rem; }
+:root[data-density="comfortable"] { --space-y: 1rem; }
+:root[data-density="comfortable"] main { font-size: 15px; }
+
+/* Reduce effects (battery saver / iPhone 8 friendly) */
+.reduce-effects *,
+.reduce-effects *::before,
+.reduce-effects *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  backdrop-filter: none !important;
+}
