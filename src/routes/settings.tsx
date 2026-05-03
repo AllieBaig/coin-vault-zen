@@ -3,6 +3,10 @@ import { useCoins } from "@/lib/coinvault/store";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { usePrefs } from "@/lib/coinvault/prefs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,8 +34,7 @@ type Pending =
 
 function Settings() {
   const { coins, replaceAll } = useCoins();
-  const [compact, setCompact] = useState(true);
-  const [animations, setAnimations] = useState(true);
+  const { prefs, set, reset } = usePrefs();
   const fileRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<Pending | null>(null);
   const [status, setStatus] = useState<{ type: "info" | "error" | "success"; msg: string } | null>(
@@ -125,6 +128,22 @@ function Settings() {
 
   const backup = readBackup();
 
+  const clearCaches = async () => {
+    try {
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      if ("serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      toast.success("Caches cleared");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to clear caches");
+    }
+  };
+
   return (
     <div className="space-y-4 max-w-2xl">
       <div>
@@ -132,17 +151,99 @@ function Settings() {
         <p className="text-[13px] text-muted-foreground mt-0.5">Preferences and data</p>
       </div>
 
-      <div className="rounded-xl border border-border divide-y divide-border bg-background">
-        <Row title="Compact rows" desc="Slim list with smaller thumbnails">
-          <Switch checked={compact} onCheckedChange={setCompact} />
+      <Group title="UI & Navigation" desc="Menu visibility and placement">
+        <Row title="Show bottom menu" desc="Toggle navigation menu visibility">
+          <Switch checked={prefs.showMenu} onCheckedChange={(v) => set("showMenu", v)} />
         </Row>
-        <Row title="Subtle animations" desc="Minimal motion on interactions">
-          <Switch checked={animations} onCheckedChange={setAnimations} />
+        <Row title="Menu position" desc="Top or bottom navigation">
+          <SegSelect
+            value={prefs.menuPosition}
+            onChange={(v) => set("menuPosition", v as any)}
+            options={[{ v: "top", l: "Top" }, { v: "bottom", l: "Bottom" }]}
+          />
         </Row>
-        <Row title="Lazy-load images" desc="Defer image rendering offscreen">
-          <Switch checked disabled />
+        <Row title="Back button position" desc="Where back actions appear">
+          <SegSelect
+            value={prefs.backButtonPosition}
+            onChange={(v) => set("backButtonPosition", v as any)}
+            options={[{ v: "top", l: "Top" }, { v: "bottom", l: "Bottom" }]}
+          />
         </Row>
-      </div>
+      </Group>
+
+      <Group title="Appearance" desc="Theme, mode and motion">
+        <Row title="UI mode" desc="Mini for minimal, Pro for full controls">
+          <SegSelect
+            value={prefs.uiMode}
+            onChange={(v) => set("uiMode", v as any)}
+            options={[{ v: "mini", l: "Mini" }, { v: "pro", l: "Pro" }]}
+          />
+        </Row>
+        <Row title="Theme" desc="Paper, Dark or System">
+          <MiniSelect
+            value={prefs.theme}
+            onChange={(v) => set("theme", v as any)}
+            options={[
+              { v: "paper", l: "Paper" },
+              { v: "dark", l: "Dark" },
+              { v: "system", l: "System" },
+            ]}
+          />
+        </Row>
+        <Row title="Animation style" desc="Slide direction for transitions">
+          <MiniSelect
+            value={prefs.animationStyle}
+            onChange={(v) => set("animationStyle", v as any)}
+            options={[
+              { v: "up", l: "Up" },
+              { v: "down", l: "Down" },
+              { v: "left", l: "Left" },
+              { v: "right", l: "Right" },
+            ]}
+          />
+        </Row>
+        <Row title="Keep screen on" desc="Prevent display from sleeping">
+          <Switch checked={prefs.keepScreenOn} onCheckedChange={(v) => set("keepScreenOn", v)} />
+        </Row>
+        <Row title="Density" desc="Compact or comfortable spacing">
+          <SegSelect
+            value={prefs.density}
+            onChange={(v) => set("density", v as any)}
+            options={[{ v: "compact", l: "Compact" }, { v: "comfortable", l: "Comfort" }]}
+          />
+        </Row>
+      </Group>
+
+      <Group title="Performance" desc="Tuned for iPhone 8 and older devices">
+        <Row title="Battery saver" desc="Lower frame rate, fewer effects">
+          <Switch checked={prefs.batterySaver} onCheckedChange={(v) => set("batterySaver", v)} />
+        </Row>
+        <Row title="Reduce effects" desc="Disable blur and animations">
+          <Switch checked={prefs.reduceEffects} onCheckedChange={(v) => set("reduceEffects", v)} />
+        </Row>
+        <Row title="Lazy load UI" desc="Defer offscreen rendering">
+          <Switch checked={prefs.lazyLoadUI} onCheckedChange={(v) => set("lazyLoadUI", v)} />
+        </Row>
+        <Row title="FPS target" desc="Frame rate cap (if supported)">
+          <SegSelect
+            value={String(prefs.fpsTarget)}
+            onChange={(v) => set("fpsTarget", Number(v) as 60 | 120)}
+            options={[{ v: "60", l: "60" }, { v: "120", l: "120" }]}
+          />
+        </Row>
+      </Group>
+
+      <Group title="Advanced" desc="Service worker and cache controls">
+        <Row title="Service Worker safe mode" desc="Disable offline caching">
+          <Switch checked={prefs.swSafeMode} onCheckedChange={(v) => set("swSafeMode", v)} />
+        </Row>
+        <Row title="Cache repair / reset" desc="Clear all caches and unregister SW">
+          <Button size="sm" variant="outline" onClick={clearCaches}>Clear</Button>
+        </Row>
+        <Row title="Reset preferences" desc="Restore defaults (data is kept)">
+          <Button size="sm" variant="ghost" onClick={reset}>Reset</Button>
+        </Row>
+      </Group>
 
       <div className="rounded-xl border border-border bg-background p-4 space-y-3">
         <div>
@@ -238,12 +339,101 @@ function Row({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex items-center justify-between gap-3 px-4 py-3">
       <div>
         <div className="text-[13px] font-medium">{title}</div>
         <div className="text-[12px] text-muted-foreground">{desc}</div>
       </div>
-      {children}
+      <div className="shrink-0">{children}</div>
     </div>
+  );
+}
+
+function Group({
+  title,
+  desc,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  desc: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className="rounded-xl border border-border bg-background overflow-hidden"
+    >
+      <CollapsibleTrigger className="w-full flex items-center justify-between px-4 py-3 text-left">
+        <div>
+          <div className="text-[13px] font-medium">{title}</div>
+          <div className="text-[12px] text-muted-foreground">{desc}</div>
+        </div>
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="border-t border-border divide-y divide-border">{children}</div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+function SegSelect({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { v: string; l: string }[];
+}) {
+  return (
+    <div className="inline-flex rounded-md border border-border bg-background p-0.5 text-[12px]">
+      {options.map((o) => {
+        const active = o.v === value;
+        return (
+          <button
+            key={o.v}
+            type="button"
+            onClick={() => onChange(o.v)}
+            className={`px-2.5 py-1 rounded-[5px] transition-colors ${
+              active ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {o.l}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function MiniSelect({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { v: string; l: string }[];
+}) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="h-8 w-[120px] text-[12px]">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((o) => (
+          <SelectItem key={o.v} value={o.v} className="text-[12px]">
+            {o.l}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
