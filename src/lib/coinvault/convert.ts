@@ -135,7 +135,7 @@ export function convertOldToNew(raw: unknown): Coin[] {
     let id = coin.id;
     while (seen.has(id)) id = genId();
     seen.add(id);
-    out.push(normalizeCoin({ ...coin, id, ...(item as object) }));
+    out.push(normalizeCoin({ ...(item as object), ...coin, id }));
   }
   if (out.length === 0) throw new Error("No convertible coin entries found.");
   return out;
