@@ -28,7 +28,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<Ctx>(() => ({
     coins,
-    add: (c) => setCoins((p) => [{ ...c, id: crypto.randomUUID() }, ...p]),
+    add: (c) => setCoins((p) => [{ ...c, id: crypto.randomUUID(), addedAt: c.addedAt ?? Date.now() }, ...p]),
     update: (id, c) => setCoins((p) => p.map((x) => (x.id === id ? { ...x, ...c } : x))),
     remove: (id) => setCoins((p) => p.filter((x) => x.id !== id)),
     replaceAll: (next) => setCoins(next),
